@@ -95,6 +95,7 @@ const Header = styled.header`
     border: 1px solid gray;
     width: 3rem;
     height: 3rem;
+    z-index: 10;
 
     & > button {
       width: 100%;

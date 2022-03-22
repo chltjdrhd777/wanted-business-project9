@@ -24,6 +24,7 @@ function Url() {
       const responsedCache = await cacheStorage.match(URL);
 
       //2. find attribute from regions
+      //@ fetch 사용시 catch thenalbe하게 처리한다.
     } catch (err) {
       alert("error when find data. please check cache");
       navigate("/");

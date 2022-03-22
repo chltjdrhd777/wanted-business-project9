@@ -66,18 +66,23 @@ function Index() {
 
         finishSubmit(filteredLists, `/product/${type}`, type);
       } else {
-        fetch(URL).then(async (response) => {
-          cacheStorage.put(URL, response);
-          const lists = await response.clone().json();
-          const filteredLists = filter(value, lists, type);
+        fetch(URL)
+          .then(async (response) => {
+            const lists = await response.clone().json();
+            const filteredLists = filter(value, lists, type);
+            cacheStorage.put(URL, response);
 
-          if (!filteredLists?.length) {
-            denySubmit("No result");
-            return;
-          }
+            if (!filteredLists?.length) {
+              denySubmit("No result");
+              return;
+            }
 
-          finishSubmit(filteredLists, `/product/${type}`, type);
-        });
+            finishSubmit(filteredLists, `/product/${type}`, type);
+          })
+          .catch((err) => {
+            console.log(err);
+            denySubmit("Can't find");
+          });
       }
     } catch (err) {
       console.log(err);
@@ -187,6 +192,7 @@ const Media = css`
 const Section = styled.section`
   width: 100%;
   height: 100%;
+  transform: translateY(-5rem);
   gap: 8rem;
 
   & p.title {
