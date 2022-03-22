@@ -1,45 +1,131 @@
 import React, { useState, useRef, useEffect } from "react";
 import styled from "@emotion/styled";
 import { css } from "@emotion/react";
+import { useNavigate } from "react-router-dom";
+import makeClass from "helper/makeClass";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { SearchData } from "redux/searchSlice";
+import { useDispatch } from "redux/store";
+import { setSearchListByKeyword, setSearchTargetByUrl } from "redux/searchSlice";
 
-interface SubmitState {
-  status: "idle" | "success" | "fail" | "pending";
+export interface SubmitState {
+  status: "idle" | "pending" | "error";
   message: string;
 }
 
-function Index() {
-  const [value, setValue] = useState<string>("");
-  const [submitState, setSubmitState] = useState<SubmitState>({ status: "idle", message: "" });
-  const resetSubmit = { status: "idle", message: "" } as const;
-  const inputRef = useRef<HTMLInputElement | null>(null);
+export type SearchType = "keyword" | "url";
 
+function Index() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const [value, setValue] = useState<string>("");
+  const [submitState, setSubmitState] = useState<SubmitState>({
+    status: "idle",
+    message: "",
+  });
+  const resetSubmit = { status: "idle", message: "" } as const;
+
+  // search bar focus when mounted
+  const inputRef = useRef<HTMLInputElement | null>(null);
   useEffect(() => {
-    const current = inputRef.current as HTMLInputElement;
-    current.focus();
+    inputRef.current!.focus();
   }, []);
 
   async function onHandleSearch() {
+    if (typeof value === "string" && !value.trim()) return;
+    if (submitState.status === "pending" || submitState.status === "error") return;
+
+    setSubmitState({ status: "pending", message: "" });
+    const isURL = /^https?:\/\//;
+
+    if (!isURL.test(value)) {
+      search("keyword");
+      return;
+    }
+
+    if (isURL.test(value)) {
+      search("url");
+      return;
+    }
+  }
+
+  async function search(type: SearchType) {
     const URL = "https://static.pxl.ai/problem/data/products.json";
-    const cacheStorage = await caches.open("search");
+    const cacheStorage = await caches.open("products");
     const responsedCache = await cacheStorage.match(URL);
     try {
       if (responsedCache) {
-        console.log(await responsedCache.json());
+        const lists = await responsedCache.json();
+        const filteredLists = filter(value, lists, type);
+
+        if (!filteredLists?.length) {
+          denySubmit("No result");
+          return;
+        }
+
+        finishSubmit(filteredLists, `/product/${type}`, type);
       } else {
         fetch(URL).then(async (response) => {
-          const clone = response.clone();
           cacheStorage.put(URL, response);
-          console.log(await clone.json());
+          const lists = await response.clone().json();
+          const filteredLists = filter(value, lists, type);
+
+          if (!filteredLists?.length) {
+            denySubmit("No result");
+            return;
+          }
+
+          finishSubmit(filteredLists, `/product/${type}`, type);
         });
       }
     } catch (err) {
       console.log(err);
-      setSubmitState({
-        status: "fail",
-        message: "다시 시도해주세요",
-      });
+      denySubmit("Can't find");
+      return;
+    }
+  }
 
-      setTimeout(() => setSubmitState(resetSubmit), 500);
+  function filter(value: string, lists: SearchData[], type: SearchType) {
+    value = value.replace("드레스", "원피스");
+
+    if (type === "keyword") {
+      return lists.filter((list) => list.name.includes(value));
+    }
+
+    if (type === "url") {
+      const target = lists.find((list) => list.image_url.includes(value));
+
+      if (!target) return [];
+      return [target];
+    }
+  }
+
+  function denySubmit(message: string) {
+    setSubmitState({ status: "error", message });
+    setTimeout(() => setSubmitState(resetSubmit), 1000);
+  }
+
+  function finishSubmit(filteredLists: SearchData[], navigatePath: string, type: SearchType) {
+    if (type === "keyword") {
+      dispatch(setSearchListByKeyword(filteredLists));
+      navigate(navigatePath, { state: { keyword: value } });
+    } else if (type === "url") {
+      dispatch(setSearchTargetByUrl(filteredLists[0]));
+      navigate(navigatePath);
+    }
+
+    localStorage.setItem("searchState", "true");
+  }
+
+  function buttonText() {
+    switch (submitState.status) {
+      case "idle":
+        return "search";
+      case "pending":
+        return <AiOutlineLoading3Quarters className="loading-icon" />;
+      case "error":
+        return submitState.message;
     }
   }
 
@@ -67,8 +153,15 @@ function Index() {
           onChange={(e) => setValue(e.target.value)}
           ref={inputRef}
         />
-        <button type="button" onClick={onHandleSearch}>
-          search
+        <button
+          onClick={onHandleSearch}
+          className={makeClass({
+            active: value.trim(),
+            pending: submitState.status === "pending",
+            error: submitState.status === "error",
+          })}
+        >
+          {buttonText()}
         </button>
       </form>
     </Section>
@@ -133,6 +226,23 @@ const Section = styled.section`
       padding: 1rem;
       font-size: 1.8rem;
       color: ${({ theme }) => theme.colors.grayThree};
+      transition: background-color 0.35s ease-in-out, color 0.35s ease-in-out;
+
+      &.active {
+        background-color: ${({ theme }) => theme.colors.indigo};
+        color: ${({ theme }) => theme.colors.grayOne};
+      }
+
+      &.pending {
+        & .loading-icon {
+          ${({ theme }) => theme.animations.rotate}
+        }
+      }
+
+      &.error {
+        background-color: ${({ theme }) => theme.colors.waringColor};
+        color: ${({ theme }) => theme.colors.grayOne};
+      }
     }
   }
 

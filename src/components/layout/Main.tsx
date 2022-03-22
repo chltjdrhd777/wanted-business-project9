@@ -8,12 +8,17 @@ function Index({ children }: PropsWithChildren<{}>) {
 
 const Media = css`
   @media screen and (min-width: 768px) {
+    height: 1px;
+    min-height: calc(100vh - var(--w-header-height));
+    transform: translateY(var(--w-header-height));
     padding: var(--w-header-padding);
   }
 `;
 
 const Main = styled.main`
-  height: 100%;
+  height: 1px;
+  min-height: calc(100vh - var(--m-header-height));
+  transform: translateY(var(--m-header-height));
   padding: var(--m-header-padding);
 
   ${Media};

@@ -4,21 +4,35 @@ import styled from "@emotion/styled";
 import { css } from "@emotion/react";
 import { useNavigate } from "react-router-dom";
 import { FaPowerOff } from "react-icons/fa";
+import { useDispatch } from "react-redux";
+import { reset } from "redux/searchSlice";
 
 function Index() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   async function onDisconnect() {
     //clear
     localStorage.removeItem("persist:searchData");
-    await caches.delete("search");
+    localStorage.removeItem("searchState");
+    await caches.delete("products");
+    await caches.delete("regions");
     alert("캐시가 삭제되었습니다");
+    navigate("/");
   }
 
   return (
     <Header>
       <nav className="logo">
-        <img src={Logo} alt="logo" onClick={() => navigate("/")} />
+        <img
+          src={Logo}
+          alt="logo"
+          onClick={() => {
+            dispatch(reset());
+            localStorage.removeItem("searchState");
+            navigate("/");
+          }}
+        />
       </nav>
 
       <div className="disconnect flex-center" onClick={onDisconnect}>
@@ -57,7 +71,9 @@ const Header = styled.header`
   width: 100%;
   height: var(--m-header-height);
   padding: var(--m-header-padding);
-  position: fixed;
+  position: absolute;
+  top: 0;
+  background-color: white;
   display: flex;
   align-items: center;
   justify-content: space-between;
