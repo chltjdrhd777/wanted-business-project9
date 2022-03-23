@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "@emotion/styled";
+import { css } from "@emotion/react";
 import { useNavigate } from "react-router-dom";
 import { SearchType } from "routes/Home/Search";
 import { useDispatch } from "redux/store";
@@ -11,11 +12,15 @@ interface CardProps {
   price: number;
   imgSrc: string;
   type: SearchType;
+  q?: string;
 }
 
-function Card({ name, price, imgSrc, type }: CardProps) {
+function Card({ name, price, imgSrc, type, q }: CardProps) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  if (q === "드레스") {
+    q = "원피스";
+  }
 
   async function navigation() {
     if (type === "keyword") {
@@ -46,7 +51,7 @@ function Card({ name, price, imgSrc, type }: CardProps) {
   }
 
   return (
-    <CardArticle className="masonry-grid-item" onClick={navigation}>
+    <CardArticle onClick={navigation} className="masonry-grid-item">
       <div className="product-img">
         <img src={imgSrc} alt={name} />
       </div>
@@ -54,7 +59,12 @@ function Card({ name, price, imgSrc, type }: CardProps) {
       <div className="product-info-overlay">
         <div className="product-info-content">
           <div className="product-name">
-            <p>{name}</p>
+            <p>
+              <span>[테스트_테스트백화점] 그럴싸한 백화점 </span>
+              {name.split("").map((ch) => (
+                <span className={q?.includes(ch) ? "highlight" : ""}>{ch}</span>
+              ))}
+            </p>
           </div>
 
           <div className="price">
@@ -67,10 +77,28 @@ function Card({ name, price, imgSrc, type }: CardProps) {
   );
 }
 
+const Media = css`
+  @media screen and (min-width: 768px) {
+    width: 32%;
+  }
+
+  @media screen and (min-width: 1000px) {
+    width: 23%;
+  }
+  @media screen and (min-width: 1500px) {
+    width: 10%;
+  }
+`;
+
 const CardArticle = styled.article`
-  width: 25%;
+  //masonry part
+  width: 45%;
+  margin-bottom: 1rem;
+  ///
+
   position: relative;
   cursor: pointer;
+
   &:hover {
     & .product-info-overlay {
       opacity: 1;
@@ -89,21 +117,34 @@ const CardArticle = styled.article`
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.5);
     z-index: 0;
     opacity: 0;
     transition: opacity 0.25s ease-in-out;
 
     & .product-info-content {
-      max-width: 40%;
+      max-width: 80%;
       background-color: white;
-      transform: translate(1rem, 1rem);
+      position: absolute;
+      bottom: 1rem;
+      right: 1rem;
       padding: 1rem;
       border-radius: 1rem;
 
       & > .product-name {
         font-weight: 500;
         font-size: 1.8rem;
+        text-align: right;
+        font-size: 1.5rem;
+
+        & span {
+          white-space: pre-wrap;
+          word-break: break-word;
+        }
+
+        & span.highlight {
+          color: red;
+        }
       }
 
       & > .price {
@@ -112,14 +153,16 @@ const CardArticle = styled.article`
         gap: 0.5rem;
         flex-direction: row-reverse;
         margin-top: 1.2rem;
-        font-size: 1.8rem;
+        font-size: 1.5rem;
         & > .icon {
-          font-size: 2.5rem;
+          font-size: 2rem;
         }
         color: ${({ theme }) => theme.colors.pointColorPurple};
       }
     }
   }
+
+  ${Media}
 `;
 
 export default Card;
