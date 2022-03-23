@@ -1,17 +1,16 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import styled from "@emotion/styled";
 import { css } from "@emotion/react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "redux/store";
 import Card from "components/Card";
+import Masonary from "masonry-layout";
 
 function Keyword() {
   const navigate = useNavigate();
   const selector = useSelector((state) => state.search);
   const { state } = useLocation();
-  // console.log(state);
-  // console.log(selector);
-  const testTarget = selector?.searchList[0];
+  const testTarget = selector?.searchList.slice(0, 10);
 
   useEffect(() => {
     if (!selector.searchList.length && !localStorage.getItem("searchState")) {
@@ -19,20 +18,37 @@ function Keyword() {
     }
   }, [navigate, selector]);
 
+  //masonary
+  // const grid = useRef<HTMLElement | null>(null);
+  const masonary = new Masonary(".masonry-grid", {
+    itemSelector: ".masonry-grid-item",
+    columnWidth: ".masonry-grid-sizer",
+    percentPosition: true,
+    gutter: 10,
+  });
+
   return (
-    <Section>
-      <Card
-        imgSrc={testTarget?.image_url}
-        name={testTarget?.name}
-        price={testTarget?.price}
-        type={"keyword"}
-      />
+    <Section className="masonry-grid">
+      <div className="masonry-grid-sizer"></div>
+      {testTarget.map((target) => (
+        <Card
+          imgSrc={target?.image_url}
+          name={target?.name}
+          price={target?.price}
+          type={"keyword"}
+        />
+      ))}
     </Section>
   );
 }
 
 const Section = styled.section`
-  height: 100%;
+  width: 100%;
+  min-height: 100%;
+
+  & .masonry-grid-sizer {
+    width: 35%;
+  }
 `;
 
 export default Keyword;

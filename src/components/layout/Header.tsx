@@ -71,12 +71,13 @@ const Header = styled.header`
   width: 100%;
   height: var(--m-header-height);
   padding: var(--m-header-padding);
-  position: absolute;
+  position: fixed;
   top: 0;
   background-color: white;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  z-index: 999;
 
   & .logo {
     display: inline-block;
@@ -95,7 +96,6 @@ const Header = styled.header`
     border: 1px solid gray;
     width: 3rem;
     height: 3rem;
-    z-index: 10;
 
     & > button {
       width: 100%;

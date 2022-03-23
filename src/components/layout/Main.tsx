@@ -20,6 +20,7 @@ const Main = styled.main`
   min-height: calc(100vh - var(--m-header-height));
   transform: translateY(var(--m-header-height));
   padding: var(--m-header-padding);
+  overflow-y: scroll;
 
   ${Media};
 `;
