@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import styled from "@emotion/styled";
 import { css } from "@emotion/react";
 import { useNavigate } from "react-router-dom";
@@ -22,13 +22,17 @@ function Card({ name, price, imgSrc, type, q }: CardProps) {
     q = "원피스";
   }
 
+  const imgRef = useRef<HTMLImageElement | null>(null);
+
   async function navigation() {
     if (type === "keyword") {
+      rememberScroll();
       navigate("img", {
         state: {
           url: imgSrc,
         },
       });
+
       return;
     }
 
@@ -50,10 +54,15 @@ function Card({ name, price, imgSrc, type, q }: CardProps) {
     }
   }
 
+  function rememberScroll() {
+    const target = document.querySelector(".searchResult-main");
+    localStorage.setItem("scrollTop", JSON.stringify(target?.scrollTop));
+  }
+
   return (
     <CardArticle onClick={navigation} className="masonry-grid-item">
       <div className="product-img">
-        <img src={imgSrc} alt={name} />
+        <img src={imgSrc} alt={name} ref={imgRef} onError={() => {}} />
       </div>
 
       <div className="product-info-overlay">

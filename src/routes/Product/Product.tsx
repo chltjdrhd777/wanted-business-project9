@@ -11,7 +11,7 @@ function Keyword() {
   return (
     <>
       <Header />
-      <Main>
+      <Main className="searchResult-main">
         {searchType === "keyword" && <KeywordPage />}
         {searchType === "url" && <UrlPage />}
       </Main>
