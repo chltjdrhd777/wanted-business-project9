@@ -2,8 +2,8 @@ import React, { PropsWithChildren } from "react";
 import styled from "@emotion/styled";
 import { css } from "@emotion/react";
 
-function Index({ children }: PropsWithChildren<{}>) {
-  return <Main>{children}</Main>;
+function Index({ children, className }: PropsWithChildren<{ className?: string }>) {
+  return <Main className={className}>{children}</Main>;
 }
 
 const Media = css`

@@ -82,6 +82,7 @@ const Header = styled.header`
   & .logo {
     display: inline-block;
     height: 100%;
+    cursor: pointer;
 
     & img {
       height: 100%;

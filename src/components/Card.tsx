@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import styled from "@emotion/styled";
 import { css } from "@emotion/react";
 import { useNavigate } from "react-router-dom";
@@ -22,13 +22,17 @@ function Card({ name, price, imgSrc, type, q }: CardProps) {
     q = "원피스";
   }
 
+  const imgRef = useRef<HTMLImageElement | null>(null);
+
   async function navigation() {
     if (type === "keyword") {
+      rememberScroll();
       navigate("img", {
         state: {
           url: imgSrc,
         },
       });
+
       return;
     }
 
@@ -50,10 +54,15 @@ function Card({ name, price, imgSrc, type, q }: CardProps) {
     }
   }
 
+  function rememberScroll() {
+    const target = document.querySelector(".searchResult-main");
+    localStorage.setItem("scrollTop", JSON.stringify(target?.scrollTop));
+  }
+
   return (
     <CardArticle onClick={navigation} className="masonry-grid-item">
       <div className="product-img">
-        <img src={imgSrc} alt={name} />
+        <img src={imgSrc} alt={name} ref={imgRef} onError={() => {}} />
       </div>
 
       <div className="product-info-overlay">
@@ -61,8 +70,10 @@ function Card({ name, price, imgSrc, type, q }: CardProps) {
           <div className="product-name">
             <p>
               <span>[테스트_테스트백화점] 그럴싸한 백화점 </span>
-              {name.split("").map((ch) => (
-                <span className={q?.includes(ch) ? "highlight" : ""}>{ch}</span>
+              {name.split("").map((ch, idx) => (
+                <span key={idx} className={q?.includes(ch) ? "highlight" : ""}>
+                  {ch}
+                </span>
               ))}
             </p>
           </div>
@@ -77,25 +88,9 @@ function Card({ name, price, imgSrc, type, q }: CardProps) {
   );
 }
 
-const Media = css`
-  @media screen and (min-width: 768px) {
-    width: 32%;
-  }
-
-  @media screen and (min-width: 1000px) {
-    width: 23%;
-  }
-  @media screen and (min-width: 1500px) {
-    width: 10%;
-  }
-`;
+const Media = css``;
 
 const CardArticle = styled.article`
-  //masonry part
-  width: 45%;
-  margin-bottom: 1rem;
-  ///
-
   position: relative;
   cursor: pointer;
 

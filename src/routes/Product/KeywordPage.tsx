@@ -1,95 +1,144 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import styled from "@emotion/styled";
 import { css } from "@emotion/react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "redux/store";
 import Card from "components/Card";
-import Masonry from "masonry-layout";
-import { SearchData } from "redux/searchSlice";
+import Masonry from "react-masonry-css";
+import { setSliderList } from "redux/searchSlice";
+import { useDispatch } from "redux/store";
 
 function Keyword() {
   const navigate = useNavigate();
-  const selector = useSelector((state) => state.search);
+  const dispatch = useDispatch();
+  const { searchList, sliderList } = useSelector((state) => state.search);
   const { state } = useLocation();
-  const [itemList, setItemList] = useState<SearchData[]>(selector?.searchList.slice(0, 10));
-  const [cursor, setCursor] = useState<number>(10);
+  const [cursor, setCursor] = useState<number>(0);
+  const [loading, setLoading] = useState(false);
+
+  //io
+  const loadingRef = useRef<HTMLDivElement | null>(null);
+  const io = useMemo(
+    () =>
+      new IntersectionObserver(
+        (entries, observer) => {
+          if (entries[0] && entries[0].isIntersecting) {
+            setLoading(true);
+          }
+        },
+        { threshold: 0.5 }
+      ),
+    []
+  );
 
   useEffect(() => {
-    if (!selector.searchList.length && !localStorage.getItem("searchState")) {
+    //if no list, go back
+    if (!searchList.length && !localStorage.getItem("searchState")) {
       navigate("/");
     }
-  }, [navigate, selector]);
+  }, [navigate, searchList]);
 
   useEffect(() => {
-    if (itemList.length) {
-      setCursor(itemList[itemList.length - 1].product_code);
+    //set obsever
+    io.observe(loadingRef.current as HTMLDivElement);
+    if (sliderList.length) {
+      setCursor(sliderList.length);
     }
-  }, [itemList]);
+  }, [io, sliderList]);
 
-  //masonry
-  const ref = useRef<HTMLElement | null>(null);
   useEffect(() => {
-    const msnry = new Masonry(ref.current as HTMLElement, {
-      itemSelector: ".masonry-grid-item",
-      columnWidth: ".grid-resizer",
-      percentPosition: true,
-      gutter: 10,
-    });
-  });
+    //update list
+    if (loading) {
+      let updateList = searchList.slice(cursor, cursor + 10);
+      if (!sliderList.length) {
+        //first page shows at most 30 itmes
+        updateList = searchList.slice(cursor, cursor + 30);
+      }
+
+      if (updateList.length) {
+        dispatch(setSliderList([...sliderList, ...updateList]));
+        setCursor(cursor + 10);
+      }
+      setLoading(false);
+    }
+  }, [dispatch, sliderList, searchList, cursor, loading]);
+
+  useEffect(() => {
+    //back to previous scroll
+    if (sliderList) {
+      const scrollTop = localStorage.getItem("scrollTop");
+
+      if (scrollTop) {
+        const target = document.querySelector(".searchResult-main");
+        target!.scrollTop = Number(scrollTop);
+      }
+
+      localStorage.removeItem("scrollTop");
+    }
+  }, [sliderList]);
 
   return (
-    <Section className="masonry-grid" ref={ref}>
-      <div className="grid-resizer"></div>
-      {itemList.map((item) => (
-        <Card
-          imgSrc={item?.image_url}
-          name={item?.name}
-          price={item?.price}
-          type={"keyword"}
-          q={(state as { keyword: string }).keyword}
-        />
-      ))}
+    <Section>
+      <Masonry
+        breakpointCols={{
+          default: 5,
+          1400: 5,
+          1000: 4,
+          768: 3,
+          500: 2,
+        }}
+        className="my-masonry-grid"
+        columnClassName="my-masonry-grid_column"
+      >
+        {sliderList.map((item, index) => (
+          <Card
+            key={index}
+            imgSrc={item?.image_url}
+            name={item?.name}
+            price={item?.price}
+            type={"keyword"}
+            q={(state as { keyword: string }).keyword}
+          />
+        ))}
+      </Masonry>
+      <div className="loading-bar" ref={loadingRef}></div>
     </Section>
   );
 }
 
-const Media = css`
-  @media screen and (min-width: 768px) {
-    & .grid-resizer {
-      width: 32%;
-    }
-
-    margin-left: 0.5rem;
-  }
-
-  @media screen and (min-width: 1000px) {
-    & .grid-resizer {
-      width: 23%;
-    }
-
-    margin-left: 2.5rem;
-  }
-
-  @media screen and (min-width: 1500px) {
-    & .grid-resizer {
-      width: 10%;
-    }
-
-    margin-left: 3.5rem;
-  }
-`;
+const Media = css``;
 
 const Section = styled.section`
   min-width: 100%;
-  max-width: 100%;
   min-height: 100%;
+  margin-left: 1.2rem;
+  position: relative;
 
-  //masonry part
-  & .grid-resizer {
-    width: 45%;
+  .my-masonry-grid {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    margin-left: -3rem;
+    width: auto;
   }
-  margin-left: 1.5rem;
-  ///
+  .my-masonry-grid_column {
+    padding-left: 0.5rem;
+    background-clip: padding-box;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .my-masonry-grid_column > article {
+    background: grey;
+    margin-bottom: 0.5rem;
+  }
+
+  .loading-bar {
+    width: 100%;
+    height: 20rem;
+    position: absolute;
+    bottom: 0;
+    background-color: transparent;
+  }
 
   ${Media}
 `;
