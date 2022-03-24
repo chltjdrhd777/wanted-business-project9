@@ -1,20 +1,28 @@
 import React, { useEffect, useCallback } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useSelector } from "redux/store";
+import { Search, useLocation, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "redux/store";
 import styled from "@emotion/styled";
 import Card from "components/Card";
-import { SearchData } from "redux/searchSlice";
+import {
+  SearchData,
+  setSearchTargetByUrl,
+  setSearchList,
+  setSliderList,
+  RegionData,
+  setAttributes,
+} from "redux/searchSlice";
 
 function Url() {
   const navigate = useNavigate();
-  const selector = useSelector((state) => state.search);
-  const target = selector.searchTarget as SearchData;
+  const dispatch = useDispatch();
+  const { searchTarget, searchList } = useSelector((state) => state.search);
+  const target = searchTarget as SearchData;
 
   useEffect(() => {
-    if (!selector.searchTarget && !localStorage.getItem("searchState")) {
+    if (!searchTarget && !localStorage.getItem("searchState")) {
       navigate("/");
     }
-  }, [navigate, selector]);
+  }, [navigate, searchTarget]);
 
   const dataUpdate = useCallback(async () => {
     try {
@@ -22,14 +30,101 @@ function Url() {
       const URL = "https://static.pxl.ai/problem/data/products.json";
       const cacheStorage = await caches.open("products");
       const responsedCache = await cacheStorage.match(URL);
+      if (responsedCache) {
+        const lists = (await responsedCache.json()) as SearchData[];
+        const filteredList = lists.filter((list) => {
+          let result = false;
+
+          for (let category of list.category_names) {
+            if (searchTarget?.category_names.includes(category)) {
+              result = true;
+            } else {
+              result = false;
+            }
+          }
+
+          return result;
+        });
+        storeListUpdate(filteredList);
+      } else {
+        fetch(URL)
+          .then(async (response) => {
+            const lists = (await response.clone().json()) as SearchData[];
+            const filteredList = lists.filter((list) => {
+              let result = false;
+
+              for (let category of list.category_names) {
+                if (searchTarget?.category_names.includes(category)) {
+                  result = true;
+                } else {
+                  result = false;
+                }
+              }
+
+              return result;
+            });
+            cacheStorage.put(URL, response);
+
+            storeListUpdate(filteredList);
+          })
+          .catch((err) => {
+            console.log(err);
+            alert("something wrong");
+            navigate("/");
+          });
+      }
 
       //2. find attribute from regions
-      //@ fetch 사용시 catch thenalbe하게 처리한다.
     } catch (err) {
+      console.log(err);
       alert("error when find data. please check cache");
       navigate("/");
     }
   }, [navigate]);
+
+  async function storeListUpdate(filteredList: SearchData[]) {
+    const URL = "https://static.pxl.ai/problem/data/regions.json";
+    const cacheStorage = await caches.open("regions");
+    const responsedCache = await cacheStorage.match(URL);
+    if (responsedCache) {
+      const lists = (await responsedCache.json()) as RegionData[];
+      const findtargetRegion = lists.find(
+        (list) => list.product_code === searchTarget?.product_code
+      );
+
+      if (!findtargetRegion) {
+        alert("there is an Error from data");
+        navigate("/");
+        return;
+      }
+
+      dispatch(setSearchList(filteredList));
+      dispatch(setAttributes(findtargetRegion.attributes));
+    } else {
+      fetch(URL)
+        .then(async (response) => {
+          const lists = (await response.clone().json()) as RegionData[];
+          const findtargetRegion = lists.find(
+            (list) => list.product_code === searchTarget?.product_code
+          );
+          cacheStorage.put(URL, response);
+
+          if (!findtargetRegion) {
+            alert("there is an Error from data");
+            navigate("/");
+            return;
+          }
+
+          dispatch(setSearchList(filteredList));
+          dispatch(setAttributes(findtargetRegion.attributes));
+        })
+        .catch((err) => {
+          console.log(err);
+          alert("there is an Error from data");
+          navigate("/");
+        });
+    }
+  }
 
   useEffect(() => {
     dataUpdate();

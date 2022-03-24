@@ -13,10 +13,8 @@ function Keyword() {
   const dispatch = useDispatch();
   const { searchList, sliderList } = useSelector((state) => state.search);
   const { state } = useLocation();
-  const [cursor, setCursor] = useState<number>(10);
+  const [cursor, setCursor] = useState<number>(0);
   const [loading, setLoading] = useState(false);
-
-  //todo 위로 올라가는 버튼 (list 길이가 10개 넘어갈 시)
 
   //io
   const loadingRef = useRef<HTMLDivElement | null>(null);
@@ -24,7 +22,7 @@ function Keyword() {
     () =>
       new IntersectionObserver(
         (entries, observer) => {
-          if (entries[0] && entries[0].intersectionRatio > 0.5) {
+          if (entries[0] && entries[0].isIntersecting) {
             setLoading(true);
           }
         },
@@ -51,7 +49,12 @@ function Keyword() {
   useEffect(() => {
     //update list
     if (loading) {
-      const updateList = searchList.slice(cursor, cursor + 10);
+      let updateList = searchList.slice(cursor, cursor + 10);
+      if (!sliderList.length) {
+        //first page shows at most 30 itmes
+        updateList = searchList.slice(cursor, cursor + 30);
+      }
+
       if (updateList.length) {
         dispatch(setSliderList([...sliderList, ...updateList]));
         setCursor(cursor + 10);
@@ -61,13 +64,18 @@ function Keyword() {
   }, [dispatch, sliderList, searchList, cursor, loading]);
 
   useEffect(() => {
-    const scrollTop = localStorage.getItem("scrollTop");
-    if (scrollTop) {
-      const target = document.querySelector(".searchResult-main");
-      target!.scrollTop = Number(scrollTop);
+    //back to previous scroll
+    if (sliderList) {
+      const scrollTop = localStorage.getItem("scrollTop");
+
+      if (scrollTop) {
+        const target = document.querySelector(".searchResult-main");
+        target!.scrollTop = Number(scrollTop);
+      }
+
+      localStorage.removeItem("scrollTop");
     }
-    localStorage.removeItem("scrollTop");
-  }, []);
+  }, [sliderList]);
 
   return (
     <Section>
@@ -102,7 +110,6 @@ const Media = css``;
 
 const Section = styled.section`
   min-width: 100%;
-  max-width: 100%;
   min-height: 100%;
   margin-left: 1.2rem;
   position: relative;
