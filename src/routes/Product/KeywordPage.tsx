@@ -90,9 +90,9 @@ function Keyword() {
         className="my-masonry-grid"
         columnClassName="my-masonry-grid_column"
       >
-        {sliderList.map((item, index) => (
+        {sliderList.map((item) => (
           <Card
-            key={index}
+            key={item.product_code}
             imgSrc={item?.image_url}
             name={item?.name}
             price={item?.price}
