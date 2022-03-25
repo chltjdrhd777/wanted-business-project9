@@ -32,7 +32,15 @@ WANTED & CODESTATES 프리온보딩 코스 개인과제
 
 <br/>
 
-- G. 전체 레이아웃은 반응형으로 제작되었습니다.
+- G. 뒤로가기나 앞으로 가기 등 history를 통해 이동하려는 시도를 할 때 필요한 데이터가 없으면 홈페이지로 다시 돌아가도록 라우팅 처리하였습니다
+
+<br/>
+
+- H. 전체 레이아웃은 반응형으로 제작되었습니다.
+
+<br/>
+
+- I . Masonry layout은 무한스크롤로 업데이트되도록 구현하였습니다.
 
 ---
 
@@ -42,17 +50,18 @@ WANTED & CODESTATES 프리온보딩 코스 개인과제
 
 A. 첫페이지
 
-<img src="https://user-images.githubusercontent.com/85816029/158819764-b613d861-4066-423d-879f-c93c1900273b.gif" width="700px" height="400px">
+![a](https://user-images.githubusercontent.com/58500558/160059130-fcab9ce9-5445-4c22-b52b-d78fd2e74216.gif)
 
 <br>
 
-1. 탭 슬라이드
+B. 키워드 검색 및 무한스크롤 업데이트
 
-<img src="https://user-images.githubusercontent.com/85816029/158819686-9e027a02-a0aa-402f-a513-613544f2f78c.gif" width="700px" height="400px">
+![B](https://user-images.githubusercontent.com/58500558/160060390-9f5a4c07-d92e-44c0-9273-b055c267046d.gif)
+
 
 <br>
 
-3. 알쓸B잡
+3. 이미지 카드 마우스 올릴 시 상세데이터 및 클릭시 이미지 라우팅
 
 <img src="https://user-images.githubusercontent.com/85816029/158819733-37964975-32ae-48cb-a1f3-95fd41249c69.gif" width="700px" height="400px">
 
