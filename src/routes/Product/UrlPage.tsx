@@ -6,7 +6,6 @@ import { css } from "@emotion/react";
 import Card from "components/Card";
 import {
   SearchData,
-  setSearchTargetByUrl,
   setSearchList,
   setSliderList,
   RegionData,
@@ -108,7 +107,6 @@ function Url() {
       const findtargetRegion = lists.find(
         (list) => list.product_code === searchTarget?.product_code
       );
-      // console.log(searchTarget, target, findtargetRegion);
 
       dispatch(setSearchList(filteredList));
 
@@ -160,22 +158,6 @@ function Url() {
       return;
     }
   }, [loading, searchList, sliderList]);
-
-  // useEffect(() => {
-  //   console.log(searchList);
-  //   if (searchList.length && !sliderList.length) {
-  //     const firstData = searchList.slice(0, 30);
-  //     console.log(searchList, firstData, "waefawefawef");
-  //     dispatch(setSliderList(firstData));
-  //     return;
-  //   }
-
-  //   if (loading) {
-  //     console.log("yes loading");
-  //     const updateData = searchList.slice(sliderList.length, sliderList.length + 10);
-  //     dispatch(setSearchList(updateData));
-  //   }
-  // }, [loading]);
 
   useEffect(() => {
     if (loadingRef.current) {
