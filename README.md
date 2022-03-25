@@ -7,6 +7,7 @@ WANTED & CODESTATES 프리온보딩 코스 개인과제
 제작기간: 2022.03.21 ~ 2022.03.25
 
 [배포링크](https://chltjdrhd777.netlify.app/)
+[회고 블로그](https://velog.io/@chltjdrhd777/%EA%B8%B0%EC%97%85%EA%B3%BC%EC%A0%9C-%ED%9A%8C%EA%B3%A0-cache-storage-%EB%B0%8F-%EA%B8%B0%ED%83%80-%EA%B3%A0%EC%83%9D%EB%82%B4%EC%9A%A9)
 
 <br>
 
@@ -42,6 +43,10 @@ WANTED & CODESTATES 프리온보딩 코스 개인과제
 
 - I . Masonry layout은 무한스크롤로 업데이트되도록 구현하였습니다.
 
+<br/>
+
+- J . 데이터들은 요구사항에 맞춰 초기요청이 일어나면 cache storage에 저장하고 그 이후로는 요청을 보내지 않고 캐시 스토리지에 있는 데이터를 사용하도록 구현하였습니다.
+
 ---
 
 ### 🧔 시연사항
@@ -58,7 +63,6 @@ B. 키워드 검색 및 무한스크롤 업데이트
 
 ![B](https://user-images.githubusercontent.com/58500558/160060390-9f5a4c07-d92e-44c0-9273-b055c267046d.gif)
 
-
 <br>
 
 3. 이미지 카드 마우스 올릴 시 상세데이터 및 클릭시 이미지 라우팅
@@ -71,7 +75,6 @@ B. 키워드 검색 및 무한스크롤 업데이트
 
 ![D](https://user-images.githubusercontent.com/58500558/160060965-39be7e67-41d3-439e-927e-4012cee4ffca.gif)
 
-
 <br>
 
 5. URL 검색 후 상품카드 클릭시 상세컴포넌트 업데이트
@@ -79,14 +82,6 @@ B. 키워드 검색 및 무한스크롤 업데이트
 ![E](https://user-images.githubusercontent.com/58500558/160061111-0bba4820-f056-46b6-8051-24207ff9d2e6.gif)
 
 <br>
-
----
-
-## 🧔 회고
-
-[회고 블로그]()
-
----
 
 ## 🗂 프로젝트 구조
 
