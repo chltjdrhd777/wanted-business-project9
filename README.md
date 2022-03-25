@@ -19,7 +19,7 @@ WANTED & CODESTATES 프리온보딩 코스 개인과제
 - B. 헤더에 있는 로고를 누르면 검색 기록이 초기화되며 좌측의 종료버튼을 누르면 전체 캐시까지 함께 clear되도록 제작하였습니다
   <br/>
 
-- C. [keyword로 검색했을 시] masonry layout으로 상품들이 나열되고 마우스를 올리게 되면 오버레이가 생기며 상품 상세 데이터가 나오도록 제작하였습니다
+- C. [keyword로 검색했을 시] masonry layout으로 상품들이 나열되고 마우스를 올리게 되면 오버레이가 생기며 상품 상세 데이터가 나오도록 제작하였습니다. 검색된 키워드는 붉은색으로 하이라이트되도록 처리하였습니다.
   <br/>
 
 - D. [keyword로 검색했을 시] 상품 카드를 클릭하게 되면 이미지 페이지로 라우팅되라는 요구조건에 맞추어 제작하였고, 뒤로가기 버튼을 하면 history를 통해 뒤로 이동하며 기존 저장해둔 스크롤 위치를 유지하도록 제작하였습니다
@@ -63,19 +63,20 @@ B. 키워드 검색 및 무한스크롤 업데이트
 
 3. 이미지 카드 마우스 올릴 시 상세데이터 및 클릭시 이미지 라우팅
 
-<img src="https://user-images.githubusercontent.com/85816029/158819733-37964975-32ae-48cb-a1f3-95fd41249c69.gif" width="700px" height="400px">
+![C](https://user-images.githubusercontent.com/58500558/160060777-f0075b0c-ab49-406c-8d09-c84df52e46d2.gif)
 
 <br>
 
-4. 유튜브
+4. url로 상품검색
 
-<img src="https://user-images.githubusercontent.com/85816029/158819742-45bbac17-232b-446d-9265-c6a65e0b9583.gif" width="700px" height="400px">
+![D](https://user-images.githubusercontent.com/58500558/160060965-39be7e67-41d3-439e-927e-4012cee4ffca.gif)
+
 
 <br>
 
-5. 인사이트
+5. URL 검색 후 상품카드 클릭시 상세컴포넌트 업데이트
 
-<img src="https://user-images.githubusercontent.com/85816029/158819754-4e31afd2-1dab-4ca0-a656-74ee5d4ca665.gif" width="700px" height="400px">
+![E](https://user-images.githubusercontent.com/58500558/160061111-0bba4820-f056-46b6-8051-24207ff9d2e6.gif)
 
 <br>
 
