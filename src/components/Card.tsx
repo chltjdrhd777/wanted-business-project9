@@ -27,6 +27,7 @@ function Card({ name, price, imgSrc, type, q }: CardProps) {
   async function navigation() {
     if (type === "keyword") {
       rememberScroll();
+
       navigate("img", {
         state: {
           url: imgSrc,
@@ -44,6 +45,11 @@ function Card({ name, price, imgSrc, type, q }: CardProps) {
         const lists = await responsedCache!.json();
         const target = lists!.find((list: SearchData) => list.image_url.includes(imgSrc));
 
+        if (!target) {
+          alert("cannot occur only if intentionally delete cache");
+          navigate("/");
+        }
+
         dispatch(setSearchTargetByUrl(target));
 
         navigate("");
@@ -55,6 +61,7 @@ function Card({ name, price, imgSrc, type, q }: CardProps) {
   }
 
   function rememberScroll() {
+    // only for keyword search
     const target = document.querySelector(".searchResult-main");
     localStorage.setItem("scrollTop", JSON.stringify(target?.scrollTop));
   }
@@ -65,34 +72,83 @@ function Card({ name, price, imgSrc, type, q }: CardProps) {
         <img src={imgSrc} alt={name} ref={imgRef} onError={() => {}} />
       </div>
 
-      <div className="product-info-overlay">
-        <div className="product-info-content">
-          <div className="product-name">
+      {type === "keyword" ? (
+        <div className="product-info-overlay">
+          <div className="product-info-content">
+            <div className="product-name">
+              <p>
+                <span>[테스트_테스트백화점] 그럴싸한 백화점 </span>
+                {name.split("").map((ch, idx) => (
+                  <span key={idx} className={q?.includes(ch) ? "highlight" : ""}>
+                    {ch}
+                  </span>
+                ))}
+              </p>
+            </div>
+
+            <div className="price">
+              <span>{price}</span>
+              <RiMoneyDollarCircleLine className="icon" />
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="product-info-urlsearch">
+          <div className="product-name-urlsearch">
             <p>
               <span>[테스트_테스트백화점] 그럴싸한 백화점 </span>
-              {name.split("").map((ch, idx) => (
-                <span key={idx} className={q?.includes(ch) ? "highlight" : ""}>
-                  {ch}
-                </span>
-              ))}
+              {name}
             </p>
           </div>
 
-          <div className="price">
-            <span>{price}</span>
+          <div className="product-price-urlsearch">
+            {price}
             <RiMoneyDollarCircleLine className="icon" />
           </div>
         </div>
-      </div>
+      )}
     </CardArticle>
   );
 }
 
-const Media = css``;
+const Media = css`
+  @media screen and (max-width: 500px) {
+    .product-info-urlsearch {
+      & .product-name-urlsearch {
+        font-size: 1.3rem;
+      }
+
+      & .product-price-urlsearch {
+        font-size: 1.2rem;
+        & svg {
+          font-size: 1.6rem;
+        }
+      }
+    }
+  }
+
+  @media screen and (max-width: 420px) {
+    .product-info-urlsearch {
+      & .product-name-urlsearch {
+        font-size: 1rem;
+      }
+
+      & .product-price-urlsearch {
+        font-size: 1rem;
+        & svg {
+          font-size: 1.3rem;
+        }
+      }
+    }
+  }
+`;
 
 const CardArticle = styled.article`
   position: relative;
   cursor: pointer;
+  border: 1px solid gray;
+  border-radius: 0.5rem;
+  overflow: hidden;
 
   &:hover {
     & .product-info-overlay {
@@ -154,6 +210,28 @@ const CardArticle = styled.article`
         }
         color: ${({ theme }) => theme.colors.pointColorPurple};
       }
+    }
+  }
+
+  & .product-info-urlsearch {
+    padding: 0.5rem 1rem;
+    background-color: white;
+    border-top: 1px solid gray;
+
+    & .product-name-urlsearch {
+      font-size: 1.5rem;
+    }
+
+    & .product-price-urlsearch {
+      display: flex;
+      flex-direction: row-reverse;
+      align-items: center;
+      gap: 0.5rem;
+      color: ${({ theme }) => theme.colors.pointColorPurple};
+      & svg {
+        font-size: 2rem;
+      }
+      margin-top: 0.5rem;
     }
   }
 
